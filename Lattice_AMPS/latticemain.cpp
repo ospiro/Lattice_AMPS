@@ -9,11 +9,24 @@
 #include <iostream>
 #include <functional>
 #include <random>
+
+#define _USE_MATH_DEFINES
+#include <cmath>
+
+
+#define empty 0
+#define producer 1
+#define resistant 2
+#define susceptible 3
+#define wall 4
+
+#define NotOutOfBounds(i,j) (i > 0 && i<width && j>0 && j<width)
+
 using namespace std;
 
 //int *initGrid(int width,double prob_empty, double prob_prod, double prob_res, double prob_susc);
 
-//int *newState(int *lattice, int width, int time_step, double death_rate, double birth_rate_prod, double birth_rate_res, double birth_rate_susc, double col_strength, double move_rate);
+//int *newState(int *lattice, int width, int time_step, double death_rate, double birth_rate_prod, double birth_rate_res, double birth_rate_susc, double col_strength, double dispersal_rate);
 int *initGrid(int width,double prob_empty,double prob_prod,double prob_res,double prob_susc)
 {
     
@@ -24,50 +37,71 @@ int *initGrid(int width,double prob_empty,double prob_prod,double prob_res,doubl
     double *randmatrix = new double[width*width];
     int *outlattice = new int[width*width];
     
-    for(int i = 0;i<width*width;i++)
+    for(int i = 0;i<width;i++)
     {
-        randmatrix[i] = realDist(mt_rand);
+        for(int j = 0; j< width; j++)
+        {
+            randmatrix[width*i+j] = realDist(mt_rand);
+    
+        }
     }
-    for(int i = 0;i<width*width;i++)
+    
+    for(int i = 0;i<width;i++)
     {
-        if(randmatrix[i]<prob_empty) ////TODO: rewrite all these as else ifs again
+        for(int j = 0; j< width; j++)
         {
-            outlattice[i]=0;
+            if( i==0 || j==0 || i==width-1 ||j==width-1 )
+            {
+                outlattice[width*i+j]=wall;
+            }
+            
+            else if(randmatrix[width*i+j]<prob_empty) ////TODO: rewrite all these as else ifs again
+            {
+                outlattice[width*i+j]=empty;
+            }
+            else if(randmatrix[width*i+j]>=prob_empty && randmatrix[width*i+j]< prob_prod+prob_empty)
+            {
+                outlattice[width*i+j] = producer;
+            }
+            else if(randmatrix[width*i+j]>=prob_prod+prob_empty && randmatrix[width*i+j]<prob_res+prob_prod+prob_empty) //superfluous and statement probably
+            {
+                outlattice[width*i+j]= resistant;
+            }
+            else if(randmatrix[width*i+j]>=prob_res+prob_prod+prob_empty)
+            {
+                outlattice[width*i+j]=susceptible;
+            }
         }
-        if(randmatrix[i]>=prob_empty && randmatrix[i]< prob_prod+prob_empty)
-        {
-            outlattice[i] = 1;
-        }
-        if(randmatrix[i]>=prob_prod+prob_empty && randmatrix[i]<prob_res+prob_prod+prob_empty)
-        {
-            outlattice[i]=2;
-        }
-        if(randmatrix[i]>=prob_res+prob_prod+prob_empty)
-        {
-            outlattice[i]=3;
-        }
+        
     }
     
     return outlattice;
 }
 
 
-int *newState(int *inlattice, int width, double time_step, double death_rate, double birth_rate_prod, double birth_rate_res, double  birth_rate_susc, double col_strength, double move_rate)
+int *newState(int *inlattice, int width, double time_step, double death_rate, double birth_rate[4], double col_strength, double dispersal_radius)
 {
-    //mersenne twister random num gen, for use later
     int step_i[4] = {0,1,0,-1};
     int step_j[4] = {-1,0,1,0}; //ASK: why are these different arrays?
+    
+    //mersenne twister random num gen, for use later
+    
     mt19937 crand;
     crand.seed(time(NULL));
-    std::uniform_real_distribution<double> changeRand(0,1);
+    std::uniform_real_distribution<double> changeRand(0,1); //perhaps generate matrix of random numbers late if will improve performance
     
     mt19937 lrand;
     lrand.seed(time(NULL));
     std::uniform_int_distribution<int> locationRand(0,width-1);
     
-    mt19937 mrand;
-    mrand.seed(time(NULL));
-    std::uniform_int_distribution<int> moveRand(0,2);
+    mt19937 r_rand;
+    r_rand.seed(time(NULL));
+    std::uniform_real_distribution<double> radRand(0,dispersal_radius);
+    
+    mt19937 t_rand;
+    t_rand.seed(time(NULL));
+    std::uniform_real_distribution<double> thetaRand(0,2*M_PI);//M_PI is an approximation to pi in the cmath library
+    
     
     int *lattice = new int[width*width];
     
@@ -80,148 +114,67 @@ int *newState(int *inlattice, int width, double time_step, double death_rate, do
     //TODO should I generate two rand? one for selection and one for prob of change.
     for(int count=0;count<width*width-1;count++)
     {
-        int frac_emp = 0;
-        int frac_prod = 0;
-        int frac_res = 0;
-        int frac_susc = 0;
-        int top;
-        int bot;
-        int left;
-        int right;
+        double r = changeRand(crand); // random num to determine what happens to cell selected in next line
         
         int i = locationRand(lrand), j = locationRand(lrand); //pick a random location in the lattice for the change to occur
+        int radius_rand = radRand(r_rand);
+        int theta_rand = thetaRand(t_rand);
         
-        //now that we have chosen the cell, we calculate the fractions of adjacent cells occupied by Prod, Susc, Res and Emp cells
-        
-        //NOTE: I use i,j matrix notation. So 0,0 is the top left corner.
-        
-        
-        //////////////////////////////////////////  special case, periodic boundaries
-        
-        if(i==0)
+        if(lattice[width*i+j] != empty && lattice[width*i+j] != wall)// if cell is occupied, proceed
         {
-            top = lattice[width*(width-1)+j];
-        }
-        else if(i==width-1)
-        {
-            bot = lattice[j];
-        }
-        if(j==0)
-        {
-            left = lattice[width*i+width-1];
-        }
-        if(j==width-1)
-        {
-            right = lattice[width*i];
-        }
-        
-        
-        
-        if( i!=0 && i!=(width-1) && j!=0 && j!= (width-1)) //TODO: set newwidth=width-1 to avoid all the arithmetic, TODO: rewrite if as nested switch/case
-        {
-            top = lattice[width*(i-1)+j];
-            bot = lattice[width*(i+1)+j];
-            left = lattice[width*i+(j-1)];
-            right = lattice[width*i+(j+1)];
-        }
-        
-        
-        int neigh[4] = {top,bot,left,right};
-        
-        ///create the fractions f_i, TODO: For efficiency, replace with Mark's way if needed.
-        
-        for(int k = 0;k<4;k++)
-        {
-            switch(neigh[k])
+            
+            int true_deathrate = death_rate; //this is just death_rate, unless the cell at i,j is susceptible, then it is modified by presence of producers
+            
+            
+            
+            
+            
+            if(lattice[width*i+j]==susceptible)
             {
-                case 0:
-                    frac_emp+=1/4;
-                    break;
-                case 1:
-                    frac_prod+=1/4;
-                case 2:
-                    frac_res+=1/4;
-                case 3:
-                    frac_susc+=1/4;
+                for(int k = 0;k<4;k++)
+                {
+                
+                    int adj_i = i + step_i[k];
+                    int adj_j = j + step_j[k];
                     
+                    if(NotOutOfBounds(adj_i, adj_j) && lattice[width*adj_i+adj_j] == producer)//(adj_i > 0 && adj_i <= width-1 && adj_j > 0 && adj-j <=width-1)
+                    {
+                        true_deathrate = true_deathrate+(col_strength/4);
+                    }
+                    
+                }
+                
             }
             
-        }
-        double r = changeRand(crand);
-        
-        ///////////////////////  CASE: CELL Empty--->chance cell born    ///////////////////////
-        
-        if(lattice[width*i+j]==0)
-        {
-            if( r < birth_rate_prod*frac_prod*time_step )
+            
+            
+            
+            if(r < true_deathrate*time_step)
             {
-                lattice[width*i+j]=1;
+                lattice[width*i+j]=empty; //cell death
             }
-            else if( r < birth_rate_prod*frac_prod*time_step + birth_rate_res*frac_res*time_step )
+            else if(r < (true_deathrate+birth_rate[lattice[width*i+j]])*time_step) //due to the numbers lining up birth_rate[lattice[width*i+j] is the birth rate of the species in that cell
             {
-                lattice[width*i+j]=2;
+                int targ_i = floor( i + radius_rand*sin(theta_rand)*2*M_PI );
+                int targ_j = floor( j + radius_rand*cos(theta_rand)*2*M_PI );
+                
+                if(NotOutOfBounds(targ_i, targ_j) && lattice[width*targ_i+targ_j]== empty)
+                {
+                    lattice[width*targ_i+targ_j] = lattice[width*i+j];
+                }
+                
             }
-            else if( r < birth_rate_prod*frac_prod*time_step + birth_rate_res*frac_res*time_step + birth_rate_susc*frac_susc+time_step )
-            {
-                lattice[width*i+j]=3;
-            }
-        }
-        
-        //////////////////// CASE: Cell is producer, may die or may swap with neighbor. //////////////////
-        
-        if(lattice[width*i+j]==1)
-        {
-            if (r < death_rate*time_step)
-            {
-                lattice[width*i+j]=0;
-            }
-            else if(r < (death_rate+move_rate)*time_step && i!=0 && i!=(width-1) && j!=0 && j!= (width-1) )
-            {
-                int randstep = moveRand(mrand);
-                int new_i = i+step_i[randstep];
-                int new_j = j+step_j[randstep];
-                int temp = lattice[width*new_i+new_j];
-                lattice[width*new_i+new_j] = lattice[width*i+j];
-                lattice[width*i+j] = temp;
-            }
+            
+            
+            
+            
+            
+            
         }
         
-        //////////////////Case: Cell is resistant, same as above
-        if(lattice[width*i+j]==2)
-        {
-            if (r < death_rate*time_step)
-            {
-                lattice[width*i+j]=0;
-            }
-            else if(r < (death_rate+move_rate)*time_step && i!=0 && i!=(width-1) && j!=0 && j!= (width-1))
-            {
-                int randstep = moveRand(mrand);
-                int new_i = i+step_i[randstep];
-                int new_j = j+step_j[randstep];
-                int temp = lattice[width*new_i+new_j];
-                lattice[width*new_i+new_j] = lattice[width*i+j];
-                lattice[width*i+j] = temp;
-            }
-        }
-        /////////////////Case: cell is susceptible, same as above with addition of colicin effect//////////////
-        if(lattice[width*i+j]==3)
-        {
-            if (r < (death_rate+col_strength)*time_step)
-            {
-                lattice[width*i+j]=0;
-            }
-            else if(r < (death_rate+move_rate)*time_step && i!=0 && i!=(width-1) && j!=0 && j!= (width-1))
-            {
-                int randstep = moveRand(mrand);
-                int new_i = i+step_i[randstep];
-                int new_j = j+step_j[randstep];
-                int temp = lattice[width*new_i+new_j];
-                lattice[width*new_i+new_j] = lattice[width*i+j];
-                lattice[width*i+j] = temp;
-            }
-        }
-    }
-    return lattice;
+        
+        
+    }    return lattice;
 }
 
 int main(int argc, char** argv)
@@ -229,11 +182,15 @@ int main(int argc, char** argv)
     //remove these later start
     double time_step = 0.09;
     //int width = 500;
-    double birth_rate_prod = 3;
-    double birth_rate_res = 3.4;
-    double birth_rate_susc = 4;
+    double birth_rate[4];
+    birth_rate[producer] = 3;
+    birth_rate[resistant] = 3.4;
+    birth_rate[susceptible] = 4;
     double death_rate = 1;
-    double move_rate = 5; //make sense of these values
+    
+    
+    
+    double dispersal_radius = atof(argv[2]);
     double col_strength = 4;
     
     double prob_empty = 0.4;
@@ -241,15 +198,15 @@ int main(int argc, char** argv)
     double prob_res = 0.2;
     double prob_susc = 0.2;
     
+    int num_timesteps = atoi(argv[3]);
     
     int arg = atoi(argv[1]);
     int *lat = initGrid(arg,prob_empty, prob_prod,prob_res,prob_susc);
     
-    for(int step = 1;step<1000;step++)
+    for(int step = 1;step<num_timesteps;step++)
     {
         if(step%10==0)
         {
-            system("clear");
             for(int i =0;i<arg;i++)
             {
                 for(int j=0;j<arg;j++)
@@ -260,6 +217,6 @@ int main(int argc, char** argv)
             }
             cout<<endl<<endl;
         }
-        lat = newState(lat,arg,time_step,death_rate,birth_rate_prod,birth_rate_res,birth_rate_susc,col_strength,move_rate);
-    }
+        lat = newState(lat,arg,time_step,death_rate,birth_rate, col_strength,dispersal_radius);
+      }
 }//main
