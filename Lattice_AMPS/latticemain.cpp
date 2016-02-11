@@ -9,6 +9,7 @@
 #include <iostream>
 #include <functional>
 #include <random>
+#include <fstream>
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -238,7 +239,7 @@ int main(int argc, char** argv)
     int arg = atoi(argv[1]);
     int *lat = initGrid(arg,prob_empty, prob_prod,prob_res,prob_susc);
     
-    for(int step = 1;step<num_timesteps;step++)
+    for(int step = 0;step<num_timesteps+1;step++)
     {
 //        if(step%10==0)
 //        {
@@ -258,11 +259,16 @@ int main(int argc, char** argv)
 //         }
         lat = newState(lat,arg,time_step,death_rate,birth_rate, col_strength,dispersal_radius);
         double *pop_count = population(lat,arg);
-        cout<<step<<endl;
-        cout<<"Empty: "<<pop_count[empty]<<endl;
-        cout<<"Producer: "<<pop_count[producer]<<endl;
-        cout<<"Resistant: "<<pop_count[resistant]<<endl;
-        cout<<"Susceptible: "<<pop_count[susceptible]<<endl<<endl;
-    }
+//        cout<<step<<endl;
+//        cout<<"Empty: "<<pop_count[empty]<<endl;
+//        cout<<"Producer: "<<pop_count[producer]<<endl;
+//        cout<<"Resistant: "<<pop_count[resistant]<<endl;
+//        cout<<"Susceptible: "<<pop_count[susceptible]<<endl<<endl;
+        ofstream record;
+        record.open("record.csv");
+        record<<dispersal_radius<<","<<pop_count[empty]<<","<<pop_count[producer]<<","<<pop_count[resistant]<<","<<pop_count[susceptible];
+        record.close();
+     }
+    return 0;
 
 }//main
