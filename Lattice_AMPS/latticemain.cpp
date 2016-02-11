@@ -112,21 +112,18 @@ int *newState(int *inlattice, int width, double time_step, double death_rate, do
     delete[] inlattice;
     
     //TODO should I generate two rand? one for selection and one for prob of change.
-    for(int count=0;count<width*width-1;count++)
+    for(int count=0;count<width*width;count++)
     {
         double r = changeRand(crand); // random num to determine what happens to cell selected in next line
         
         int i = locationRand(lrand), j = locationRand(lrand); //pick a random location in the lattice for the change to occur
-        int radius_rand = radRand(r_rand);
-        int theta_rand = thetaRand(t_rand);
+        double radius_rand = radRand(r_rand);
+        double theta_rand = thetaRand(t_rand);
         
         if(lattice[width*i+j] != empty && lattice[width*i+j] != wall)// if cell is occupied, proceed
         {
             
-            int true_deathrate = death_rate; //this is just death_rate, unless the cell at i,j is susceptible, then it is modified by presence of producers
-            
-            
-            
+            double true_deathrate = death_rate; //this is just death_rate, unless the cell at i,j is susceptible, then it is modified by presence of producers
             
             
             if(lattice[width*i+j]==susceptible)
@@ -153,10 +150,10 @@ int *newState(int *inlattice, int width, double time_step, double death_rate, do
             {
                 lattice[width*i+j]=empty; //cell death
             }
-            else if(r < (true_deathrate+birth_rate[lattice[width*i+j]])*time_step) //due to the numbers lining up birth_rate[lattice[width*i+j] is the birth rate of the species in that cell
+            else if(r >= true_deathrate*time_step && r< (true_deathrate+birth_rate[lattice[width*i+j]])*time_step) //due to the numbers lining up birth_rate[lattice[width*i+j]] is the birth rate of the species in that cell
             {
-                int targ_i = floor( i + radius_rand*sin(theta_rand)*2*M_PI );
-                int targ_j = floor( j + radius_rand*cos(theta_rand)*2*M_PI );
+                int targ_i = floor( i + radius_rand*sin(theta_rand));
+                int targ_j = floor( j + radius_rand*cos(theta_rand));
                 
                 if(NotOutOfBounds(targ_i, targ_j) && lattice[width*targ_i+targ_j]== empty)
                 {
@@ -174,14 +171,52 @@ int *newState(int *inlattice, int width, double time_step, double death_rate, do
         
         
         
-    }    return lattice;
+    }
+    return lattice;
+}
+
+double *population(int *lattice,int width)
+{
+    double emp_count = 0;
+    double prod_count = 0;
+    double res_count = 0;
+    double susc_count = 0;
+    for(int i =0;i<width*width;i++)
+    {
+        if(lattice[i]==empty)
+        {
+            emp_count++;
+        }
+            
+        else if(lattice[i]==producer)
+        {
+            prod_count++;
+        }
+        else if(lattice[i]==resistant)
+        {
+            res_count++;
+        }
+        else if(lattice[i]==susceptible)
+        {
+            susc_count++;
+        }
+    }
+    double *ratios = new double[4];
+    ratios[empty] = 100*emp_count/(width*width);
+    ratios[producer] = 100*prod_count/(width*width);
+    ratios[resistant] = 100*res_count/(width*width);
+    ratios[susceptible] = 100*susc_count/(width*width);
+    return ratios;
+
 }
 
 int main(int argc, char** argv)
 {
+//    clock_t start;
+//    start = clock();
+//    double duration;
     //remove these later start
     double time_step = 0.09;
-    //int width = 500;
     double birth_rate[4];
     birth_rate[producer] = 3;
     birth_rate[resistant] = 3.4;
@@ -193,8 +228,8 @@ int main(int argc, char** argv)
     double dispersal_radius = atof(argv[2]);
     double col_strength = 4;
     
-    double prob_empty = 0.4;
-    double prob_prod = 0.2;
+    double prob_empty = 0.2;
+    double prob_prod = 0.4;
     double prob_res = 0.2;
     double prob_susc = 0.2;
     
@@ -205,18 +240,29 @@ int main(int argc, char** argv)
     
     for(int step = 1;step<num_timesteps;step++)
     {
-        if(step%10==0)
-        {
-            for(int i =0;i<arg;i++)
-            {
-                for(int j=0;j<arg;j++)
-                {
-                    cout<<lat[arg*i+j];
-                }
-                cout<<endl;
-            }
-            cout<<endl<<endl;
-        }
+//        if(step%10==0)
+//        {
+//            for(int i =0;i<arg;i++)
+//            {
+//                for(int j=0;j<arg;j++)
+//                {
+//                    cout<<lat[arg*i+j];
+//                }
+//                cout<<endl;;
+//            }
+//            cout<<endl<<endl<<endl;
+////            duration = ( clock() - start ) / (double) CLOCKS_PER_SEC;
+//            
+////            cout<<"printf: "<< duration <<'\n';
+//
+//         }
         lat = newState(lat,arg,time_step,death_rate,birth_rate, col_strength,dispersal_radius);
-      }
+        double *pop_count = population(lat,arg);
+        cout<<step<<endl;
+        cout<<"Empty: "<<pop_count[empty]<<endl;
+        cout<<"Producer: "<<pop_count[producer]<<endl;
+        cout<<"Resistant: "<<pop_count[resistant]<<endl;
+        cout<<"Susceptible: "<<pop_count[susceptible]<<endl<<endl;
+    }
+
 }//main
