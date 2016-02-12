@@ -241,13 +241,18 @@ int main(int argc, char** argv)
     
     for(int step = 0;step<num_timesteps+1;step++)
     {
-//        if(step%10==0)
+//        if(step%100==0)
 //        {
 //            for(int i =0;i<arg;i++)
 //            {
 //                for(int j=0;j<arg;j++)
 //                {
 //                    cout<<lat[arg*i+j];
+//                    if(j!=arg-1)
+//                    {
+//                        cout<<",";
+//                        
+//                    }
 //                }
 //                cout<<endl;;
 //            }
@@ -258,17 +263,18 @@ int main(int argc, char** argv)
 //
 //         }
         lat = newState(lat,arg,time_step,death_rate,birth_rate, col_strength,dispersal_radius);
-        double *pop_count = population(lat,arg);
-//        cout<<step<<endl;
-//        cout<<"Empty: "<<pop_count[empty]<<endl;
-//        cout<<"Producer: "<<pop_count[producer]<<endl;
-//        cout<<"Resistant: "<<pop_count[resistant]<<endl;
-//        cout<<"Susceptible: "<<pop_count[susceptible]<<endl<<endl;
-        ofstream record;
-        record.open("record.csv");
-        record<<dispersal_radius<<","<<pop_count[empty]<<","<<pop_count[producer]<<","<<pop_count[resistant]<<","<<pop_count[susceptible];
-        record.close();
      }
+    double *pop_count = population(lat,arg);
+    //        cout<<step<<endl;
+    //        cout<<"Empty: "<<pop_count[empty]<<endl;
+    //        cout<<"Producer: "<<pop_count[producer]<<endl;
+    //        cout<<"Resistant: "<<pop_count[resistant]<<endl;
+    //        cout<<"Susceptible: "<<pop_count[susceptible]<<endl<<endl;
+    ofstream record;
+    record.open("record.csv", std::ios_base::app);
+    record<<dispersal_radius<<","<<pop_count[empty]<<","<<pop_count[producer]<<","<<pop_count[resistant]<<","<<pop_count[susceptible]<<endl;
+    record.close();
+
     return 0;
 
 }//main
