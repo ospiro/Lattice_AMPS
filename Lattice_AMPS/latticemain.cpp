@@ -1,5 +1,5 @@
 //
-//  main.cpp
+//  latticemain.cpp
 //  Lattice_AMPS
 //
 //  Created by Oliver Spiro on 2/6/16.
@@ -10,10 +10,30 @@
 #include <functional>
 #include <random>
 #include <fstream>
+#include <chrono>
+#include <thread>
 
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+
+#define RESET   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+#define BOLDBLACK   "\033[1m\033[30m"      /* Bold Black */
+#define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
+#define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
+#define BOLDYELLOW  "\033[1m\033[33m"      /* Bold Yellow */
+#define BOLDBLUE    "\033[1m\033[34m"      /* Bold Blue */
+#define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
+#define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
+#define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 
 #define empty 0
 #define producer 1
@@ -21,18 +41,33 @@
 #define susceptible 3
 #define wall 4
 
-#define NotOutOfBounds(i,j) (i > 0 && i<width && j>0 && j<width)
+#define NotOutOfBounds(i,j) ((i > 0) && (i<width) && (j>0) && (j<width))
 
 using namespace std;
+using namespace std::chrono;
+using namespace std::this_thread;
 
-//int *initGrid(int width,double prob_empty, double prob_prod, double prob_res, double prob_susc);
 
-//int *newState(int *lattice, int width, int time_step, double death_rate, double birth_rate_prod, double birth_rate_res, double birth_rate_susc, double col_strength, double dispersal_rate);
+
+
+
+mt19937 crand;
+
+mt19937 lrand;
+
+mt19937 r_rand;
+
+mt19937 t_rand;
+
+mt19937 p_rand;
+
+const double pi = std::acos(-1);
+
 int *initGrid(int width,double prob_empty,double prob_prod,double prob_res,double prob_susc)
 {
     
     mt19937 mt_rand;
-    mt_rand.seed(time(NULL));
+    mt_rand.seed(static_cast<unsigned int>(time(NULL)));
     std::uniform_real_distribution<double> realDist(0,1);
     
     double *randmatrix = new double[width*width];
@@ -79,30 +114,22 @@ int *initGrid(int width,double prob_empty,double prob_prod,double prob_res,doubl
     return outlattice;
 }
 
-
 int *newState(int *inlattice, int width, double time_step, double death_rate, double birth_rate[4], double col_strength, double dispersal_radius)
 {
     int step_i[4] = {0,1,0,-1};
-    int step_j[4] = {-1,0,1,0}; //ASK: why are these different arrays?
+    int step_j[4] = {-1,0,1,0};
     
     //mersenne twister random num gen, for use later
     
-    mt19937 crand;
-    crand.seed(time(NULL));
-    std::uniform_real_distribution<double> changeRand(0,1); //perhaps generate matrix of random numbers late if will improve performance
+    std::uniform_real_distribution<double> changeRand(0,1); //perhaps generate matrix of random numbers later if will improve performance
     
-    mt19937 lrand;
-    lrand.seed(time(NULL));
-    std::uniform_int_distribution<int> locationRand(0,width-1);
+    std::uniform_int_distribution<double> locationRand(0,width-1);
     
-    mt19937 r_rand;
-    r_rand.seed(time(NULL));
     std::uniform_real_distribution<double> radRand(0,dispersal_radius);
     
-    mt19937 t_rand;
-    t_rand.seed(time(NULL));
-    std::uniform_real_distribution<double> thetaRand(0,2*M_PI);//M_PI is an approximation to pi in the cmath library
+    std::uniform_real_distribution<double> thetaRand(0,2*M_PI);
     
+    std::uniform_real_distribution<double> unif(0,1);
     
     int *lattice = new int[width*width];
     
@@ -116,12 +143,13 @@ int *newState(int *inlattice, int width, double time_step, double death_rate, do
     for(int count=0;count<width*width;count++)
     {
         double r = changeRand(crand); // random num to determine what happens to cell selected in next line
-        
-        int i = locationRand(lrand), j = locationRand(lrand); //pick a random location in the lattice for the change to occur
+        int i = locationRand(lrand);
+        int j = locationRand(lrand); //pick a random location in the lattice for the change to occur
         double radius_rand = radRand(r_rand);
-        double theta_rand = thetaRand(t_rand);
+        //double theta_rand = thetaRand(t_rand);
         
-        if(lattice[width*i+j] != empty && lattice[width*i+j] != wall)// if cell is occupied, proceed
+        
+        if((lattice[width*i+j] != empty) && (lattice[width*i+j] != wall))// if cell is occupied, proceed
         {
             
             double true_deathrate = death_rate; //this is just death_rate, unless the cell at i,j is susceptible, then it is modified by presence of producers
@@ -135,7 +163,7 @@ int *newState(int *inlattice, int width, double time_step, double death_rate, do
                     int adj_i = i + step_i[k];
                     int adj_j = j + step_j[k];
                     
-                    if(NotOutOfBounds(adj_i, adj_j) && lattice[width*adj_i+adj_j] == producer)//(adj_i > 0 && adj_i <= width-1 && adj_j > 0 && adj-j <=width-1)
+                    if(NotOutOfBounds(adj_i, adj_j) && (lattice[width*adj_i+adj_j] == producer))//notoutofbounds--> (adj_i > 0 && adj_i < width && adj_j > 0 && adj_j <width)
                     {
                         true_deathrate = true_deathrate+(col_strength/4);
                     }
@@ -151,30 +179,28 @@ int *newState(int *inlattice, int width, double time_step, double death_rate, do
             {
                 lattice[width*i+j]=empty; //cell death
             }
-            else if(r >= true_deathrate*time_step && r< (true_deathrate+birth_rate[lattice[width*i+j]])*time_step) //due to the numbers lining up birth_rate[lattice[width*i+j]] is the birth rate of the species in that cell
+            if((r>=true_deathrate*time_step) && (r< (true_deathrate+birth_rate[lattice[width*i+j]])*time_step)) //due to the numbers lining up birth_rate[lattice[width*i+j]] is the birth rate of the species in that cell
             {
-                int targ_i = floor( i + radius_rand*sin(theta_rand));
-                int targ_j = floor( j + radius_rand*cos(theta_rand));
+                double a = unif(p_rand);
+                double b = unif(p_rand);
+                int targ_i = round(i + b*radius_rand*sin(2*M_PI*(a/b)));
+                int targ_j = round(j + b*radius_rand*cos(2*M_PI*(a/b)));
                 
-                if(NotOutOfBounds(targ_i, targ_j) && lattice[width*targ_i+targ_j]== empty)
+                if(NotOutOfBounds(targ_i, targ_j) && (lattice[width*targ_i+targ_j]== empty))
                 {
                     lattice[width*targ_i+targ_j] = lattice[width*i+j];
                 }
                 
             }
             
-            
-            
-            
-            
-            
+        
         }
         
         
         
-    }
+    }//for
     return lattice;
-}
+}//newState
 
 double *population(int *lattice,int width)
 {
@@ -203,10 +229,10 @@ double *population(int *lattice,int width)
         }
     }
     double *ratios = new double[4];
-    ratios[empty] = 100*emp_count/(width*width);
-    ratios[producer] = 100*prod_count/(width*width);
-    ratios[resistant] = 100*res_count/(width*width);
-    ratios[susceptible] = 100*susc_count/(width*width);
+    ratios[empty] = 100*emp_count/(double(width)*double(width));
+    ratios[producer] = 100*prod_count/(double(width)*double(width));
+    ratios[resistant] = 100*res_count/(double(width)*double(width));
+    ratios[susceptible] = 100*susc_count/(double(width)*double(width));
     return ratios;
 
 }
@@ -216,64 +242,106 @@ int main(int argc, char** argv)
 //    clock_t start;
 //    start = clock();
 //    double duration;
-    //remove these later start
+    
+    
     double time_step = 0.09;
     double birth_rate[4];
     birth_rate[producer] = 3;
     birth_rate[resistant] = 3.4;
     birth_rate[susceptible] = 4;
-    double death_rate = 1;
+    double death_rate = 0.9;
     
     
     
     double dispersal_radius = atof(argv[2]);
     double col_strength = 4;
     
-    double prob_empty = 0.2;
-    double prob_prod = 0.4;
+    double prob_empty = 0.4;
+    double prob_prod = 0.2;
     double prob_res = 0.2;
     double prob_susc = 0.2;
+    
+    
+    
     
     int num_timesteps = atoi(argv[3]);
     
     int arg = atoi(argv[1]);
     int *lat = initGrid(arg,prob_empty, prob_prod,prob_res,prob_susc);
+
+
+    crand.seed(static_cast<unsigned int>(time(NULL)));
+    
+    lrand.seed(static_cast<unsigned int>(time(NULL)));
+    
+    r_rand.seed(static_cast<unsigned int>(time(NULL)));
+    
+    t_rand.seed(static_cast<unsigned int>(time(NULL)));
+    
+    p_rand.seed(static_cast<unsigned int>(time(NULL)));
+    
+    
+    
+    
+    
+
     
     for(int step = 0;step<num_timesteps+1;step++)
     {
-//        if(step%100==0)
+        
+        //sleep_for(std::chrono::microseconds(100));
+//        if(step%1==0)
 //        {
-//            for(int i =0;i<arg;i++)
-//            {
-//                for(int j=0;j<arg;j++)
-//                {
-//                    cout<<lat[arg*i+j];
-//                    if(j!=arg-1)
-//                    {
-//                        cout<<",";
-//                        
-//                    }
-//                }
-//                cout<<endl;;
-//            }
-//            cout<<endl<<endl<<endl;
-////            duration = ( clock() - start ) / (double) CLOCKS_PER_SEC;
-//            
-////            cout<<"printf: "<< duration <<'\n';
-//
+        
+        sleep_for(std::chrono::microseconds(100));
+        system("clear");
+            for(int i =0;i<arg;i++)
+            {
+                for(int j=0;j<arg;j++)
+                {
+                    if(lat[arg*i+j]==empty)
+                    {
+                        cout<<WHITE<<"#"<<RESET;
+                    }
+                    else if(lat[arg*i+j]==producer)
+                    {
+                        cout<< RED << "#" << RESET;
+                    }
+                    else if(lat[arg*i+j]==resistant)
+                    {
+                        cout<< GREEN << "#" << RESET;
+                    }
+                    else if(lat[arg*i+j]==susceptible)
+                    {
+                        cout<< BLUE << "#" << RESET;
+                    }
+                    else
+                    {
+                        cout<<lat[arg*i+j];
+                    }
+                }
+                cout<<endl;;
+            }
+            cout<<endl<<endl<<endl;
+//            duration = ( clock() - start ) / (double) CLOCKS_PER_SEC;
+            
+//            cout<<"printf: "<< duration <<'\n';
+
 //         }
+//
+//        double *pop_count = population(lat,arg); //uncomment this and the next 5 lines to get population count. Best to comment out the output loop above too.
+//        cout<<step<<endl;
+//        cout<<"Empty: "<<pop_count[empty]<<endl;
+//        cout<<"Producer: "<<pop_count[producer]<<endl;
+//        cout<<"Resistant: "<<pop_count[resistant]<<endl;
+//        cout<<"Susceptible: "<<pop_count[susceptible]<<endl<<endl;
         lat = newState(lat,arg,time_step,death_rate,birth_rate, col_strength,dispersal_radius);
-     }
-    double *pop_count = population(lat,arg);
-    //        cout<<step<<endl;
-    //        cout<<"Empty: "<<pop_count[empty]<<endl;
-    //        cout<<"Producer: "<<pop_count[producer]<<endl;
-    //        cout<<"Resistant: "<<pop_count[resistant]<<endl;
-    //        cout<<"Susceptible: "<<pop_count[susceptible]<<endl<<endl;
-    ofstream record;
-    record.open("record.csv", std::ios_base::app);
-    record<<dispersal_radius<<","<<pop_count[empty]<<","<<pop_count[producer]<<","<<pop_count[resistant]<<","<<pop_count[susceptible]<<endl;
-    record.close();
+    }
+
+//    ofstream record; //uncomment this and the next three lines to get record.csv
+//    record.open("record.csv", std::ios_base::app);
+//    record<<dispersal_radius<<","<<pop_count[empty]<<","<<pop_count[producer]<<","<<pop_count[resistant]<<","<<pop_count[susceptible]<<endl;
+//    record.close();
 
     return 0;
 
