@@ -253,8 +253,8 @@ int main(int argc, char** argv)
     
     
     
-    double dispersal_radius = atof(argv[2]);
-    double col_strength = 4;
+    double dispersal_radius = atof(argv[1]);
+    double col_strength = atof(argv[2]);
     
     double prob_empty = 0.4;
     double prob_prod = 0.2;
@@ -266,7 +266,7 @@ int main(int argc, char** argv)
     
     int num_timesteps = atoi(argv[3]);
     
-    int arg = atoi(argv[1]);
+    int arg = atoi(argv[4]);
     int *lat = initGrid(arg,prob_empty, prob_prod,prob_res,prob_susc);
 
 
@@ -289,40 +289,40 @@ int main(int argc, char** argv)
     for(int step = 0;step<num_timesteps+1;step++)
     {
         
-        //sleep_for(std::chrono::microseconds(100));
-//        if(step%1==0)
+//        //sleep_for(std::chrono::microseconds(100));
+//        if(step%10==0)
 //        {
-        
-        sleep_for(std::chrono::microseconds(100));
-        system("clear");
-            for(int i =0;i<arg;i++)
-            {
-                for(int j=0;j<arg;j++)
-                {
-                    if(lat[arg*i+j]==empty)
-                    {
-                        cout<<WHITE<<"#"<<RESET;
-                    }
-                    else if(lat[arg*i+j]==producer)
-                    {
-                        cout<< RED << "#" << RESET;
-                    }
-                    else if(lat[arg*i+j]==resistant)
-                    {
-                        cout<< GREEN << "#" << RESET;
-                    }
-                    else if(lat[arg*i+j]==susceptible)
-                    {
-                        cout<< BLUE << "#" << RESET;
-                    }
-                    else
-                    {
-                        cout<<lat[arg*i+j];
-                    }
-                }
-                cout<<endl;;
-            }
-            cout<<endl<<endl<<endl;
+//        
+//        sleep_for(std::chrono::microseconds(100));
+//        system("clear");
+//            for(int i =0;i<arg;i++)
+//            {
+//                for(int j=0;j<arg;j++)
+//                {
+//                    if(lat[arg*i+j]==empty)
+//                    {
+//                        cout<<WHITE<<"o "<<RESET;
+//                    }
+//                    else if(lat[arg*i+j]==producer)
+//                    {
+//                        cout<< RED << "o " << RESET;
+//                    }
+//                    else if(lat[arg*i+j]==resistant)
+//                    {
+//                        cout<< GREEN << "o " << RESET;
+//                    }
+//                    else if(lat[arg*i+j]==susceptible)
+//                    {
+//                        cout<< BLUE << "o "<< RESET;
+//                    }
+//                    else
+//                    {
+//                        cout<<"o ";
+//                    }
+//                }
+//                cout<<endl;;
+//            }
+//            cout<<endl<<endl<<endl;
 //            duration = ( clock() - start ) / (double) CLOCKS_PER_SEC;
             
 //            cout<<"printf: "<< duration <<'\n';
@@ -337,11 +337,11 @@ int main(int argc, char** argv)
 //        cout<<"Susceptible: "<<pop_count[susceptible]<<endl<<endl;
         lat = newState(lat,arg,time_step,death_rate,birth_rate, col_strength,dispersal_radius);
     }
-
-//    ofstream record; //uncomment this and the next three lines to get record.csv
-//    record.open("record.csv", std::ios_base::app);
-//    record<<dispersal_radius<<","<<pop_count[empty]<<","<<pop_count[producer]<<","<<pop_count[resistant]<<","<<pop_count[susceptible]<<endl;
-//    record.close();
+    double *pop_count = population(lat,arg);
+    ofstream record; //uncomment this and the next three lines to get record.csv
+    record.open("record.csv", std::ios_base::app);
+    record<<dispersal_radius<<","<<col_strength<<","<<pop_count[empty]<<","<<pop_count[producer]<<","<<pop_count[resistant]<<","<<pop_count[susceptible]<<endl;
+    record.close();
 
     return 0;
 
