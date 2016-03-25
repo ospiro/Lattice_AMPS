@@ -1,22 +1,33 @@
 #include "Lattice.hpp"
 #include "Site.hpp"
 #include <iostream>
-
+#define empty 0
+#define parasite 1
+#define forb 2
+#define grass 3
 
 using namespace std;
 
 
 int main()
 {
-    
-    double birthRate[4] = {0,4,3.4,3};
-    int seedRadius = 10;
-    double toxinStrength = 4;
     double startingProb[4] = {0.25,0.25,0.25,0.25};
+    
+    double birthRate[4] = {0,0,0,0};
+    birthRate[parasite] = 3;
+    birthRate[forb] = 3.4;
+    birthRate[grass] = 4;
+    
+    double setDeathRate = 1;
+    
+    int seedRadius = 10;
+    double toxinStrength = 1;
     int setYearLength = 4;
+    
     double setdt = 0.01;
-    //double deathRate = 1;
-    Lattice myLattice(100,startingProb,birthRate,seedRadius, setdt, toxinStrength, setYearLength );
+    
+    
+    Lattice myLattice(100,startingProb,birthRate,seedRadius, setDeathRate, setdt, toxinStrength, setYearLength );
     for(int i = 0;i<10;i++)
     {
     myLattice.advanceYear();

@@ -21,7 +21,7 @@ int mod(int x, int m) { //got from http://stackoverflow.com/questions/1082917/mo
     return (x%m + m)%m;
 }
 
-Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], double setDeathRate, int setSeedRadius, int radius,double dt, double setToxinStrength, int setYearLength)
+Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSeedRadius, double setDeathRate, double dt, double setToxinStrength, int setYearLength)
 {
 //===============================Set base properties==============================================
     
