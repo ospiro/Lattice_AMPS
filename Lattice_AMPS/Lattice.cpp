@@ -9,6 +9,7 @@
 
 #include "Lattice.hpp"
 #include <iostream>
+#include <cmath>
 
 #define empty 0
 #define parasite 1
@@ -16,7 +17,11 @@
 #define grass 3
 using namespace std;
 
-Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], double setDeathRate, int setSeedRadius, double setDeathrate, int radius,double dt, double setToxinStrength, int setYearLength)
+int mod(int x, int m) { //got from http://stackoverflow.com/questions/1082917/mod-of-negative-number-is-melting-my-brain need because % doesn't behave well with negative #s
+    return (x%m + m)%m;
+}
+
+Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], double setDeathRate, int setSeedRadius, int radius,double dt, double setToxinStrength, int setYearLength)
 {
 //===============================Set base properties==============================================
     
@@ -43,6 +48,7 @@ Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], double se
     unifRun.param(newRunParams);
     std::uniform_int_distribution<int>::param_type newLocParams(0, width-1);//TODO: use as few rand num gens as possible
     unifLoc.param(newLocParams);
+    this->dt = dt;
     
     
     
@@ -80,7 +86,7 @@ Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], double se
     
     for(int i = 0; i<width;i++)
     {
-        for(int j = 0;j<width;j++)
+        for(int j = 0;j<width;j++) //TODO: use mod instead of special cases
         {
             
             //periodic boundaries leads to these special conditions on the four edges
@@ -88,28 +94,39 @@ Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], double se
             {
                 lat[width*i+j].top = &lat[width*(width-1)+j]; //wrap around to bottom
             }
+            else
+            {
+                lat[width*i+j].top = &lat[width*(i-1)+j];
+            }
             if (i==width-1)
             {
                 lat[width*i+j].bottom = &lat[width*0+j];//to top
+            }
+            else
+            {
+                lat[width*i+j].bottom = &lat[width*(i+1)+j];
             }
             if (j==0)
             {
                 lat[width*i+j].left = &lat[width*i+(width-1)]; //to right
             }
+            else
+            {
+                lat[width*i+j].left = &lat[width*i + (j-1)];
+            }
             if (j==width-1)
             {
                 lat[width*i+j].right = &lat[width*i+0]; //to left
             }
-            
-            if (i!=0 && i!=width-1 && j!=0 && j!=width-1)  //now the definitions of left neighbor, etc., for interior points
+            else
             {
-                lat[width*i+j].left = &lat[width*i + (j-1)];
                 lat[width*i+j].right = &lat[width*i + (j+1)];
-                lat[width*i+j].top = &lat[width*(i-1)+j];
-                lat[width*i+j].bottom = &lat[width*(i+1)+j];
             }
+            lat[width*i+j].setNeighbors(); //put the above into array
+            
         }
     }
+
     
 
 }
@@ -133,7 +150,7 @@ void Lattice::checkEvent(int i, int j) //TODO: make this and getDeathRate take S
     {
         lat[width*i+j].die();//TODO: assign this element to a variable, then use variable in rest of function.( assign to pointer?)
     }
-    else if (rand<(trueDeathRate+birthRate[lat[width*i+j].species])*dt && lat[width*i+j].neighbors[rand2]->species==empty) //TODO: convoluted, fix using the above assignment
+    else if ((lat[width*i+j].neighbors[rand2]->species==empty) && rand<(trueDeathRate+birthRate[lat[width*i+j].species])*dt) //TODO: convoluted, fix using the above assignment
     {
         lat[width*i+j].neighbors[rand2]->species=lat[width*i+j].species;
     }
@@ -145,25 +162,26 @@ void Lattice::checkEvent(int i, int j) //TODO: make this and getDeathRate take S
 //=========================Winter: spread seeds, wipe out lattice, sprout seeds================
 void Lattice::endOfYear()
 {
-    std::uniform_real_distribution<double>::param_type newParams(0, seedRadius);
-    unif.param(newParams);
+    
+    std::uniform_real_distribution<double>::param_type thetaParams(0, 1);
+    std::uniform_real_distribution<double>::param_type distParams(0, seedRadius);
+
+    unif.param(thetaParams);
+    unif.param(distParams);
     
     for(int i = 0;i<width;i++)
     {
         for(int j = 0;j<width;j++)
         {
-        double theta = unif(event_rand)*2*3.14159;
-        double distance = floor(seedRadius*unif(event_rand)+1); //TODO: ask: is the +1 so that radius==0 corresp to running?
-        double targI = int(round(i+distance*sin(theta)))%width; //TODO: check behavior, possible problem area
-        double targJ = int(round(j+distance*cos(theta)))%width;
-        if(targI==0)
-        {
-            targI=width;
-        }
-        if(targJ==0)
-        {
-            targJ=width;
-        }
+        double thetarand = unif(event_rand);
+        double theta = thetarand*2*3.14159;
+            
+        double distancerand = unif(event_rand);
+        double distance = floor(distancerand); //TODO: ask: is the +1 so that radius==0 corresp to running?
+        int targI = mod(int(round(double(i)+distance*cos(theta))),width); //TODO: check behavior, possible problem area
+        int targJ = mod(int(round(double(j)+distance*sin(theta))),width);
+        //TODO: ask why conditions for targI==0 were here in matlab code.
+            
         //targI,targJ designate target site for seed dispersal, now we add seeds.
             
             
@@ -175,7 +193,7 @@ void Lattice::endOfYear()
     
     
     
-    for(int k = 0; k< width;k++)
+    for(int k = 0; k< width*width;k++)
     {
             lat[k].die(); //TODO: ask if necessary ...//kill all plants
             lat[k].sproutSeeds();
@@ -205,11 +223,56 @@ void Lattice::advanceYear()
     for(int i = 0; i<numSteps; i++)
     {
         advanceTimeStep();
-        printLattice();
+        population();
     }
     endOfYear();
     
 }
+//====================Print population percentages=============================================
+
+void Lattice::population()
+{
+    double emp_count = 0;
+    double para_count = 0;
+    double forb_count = 0;
+    double grass_count = 0;
+    for(int i =0;i<width*width;i++)
+    {
+        if(lat[i].species==empty)
+        {
+            emp_count++;
+        }
+        
+        else if(lat[i].species==parasite)
+        {
+            para_count++;
+        }
+        else if(lat[i].species==forb)
+        {
+            forb_count++;
+        }
+        else if(lat[i].species==grass)
+        {
+            grass_count++;
+        }
+    }
+    double *ratios = new double[4];
+    ratios[empty] = 100*emp_count/(double(width)*double(width));
+    ratios[parasite] = 100*para_count/(double(width)*double(width));
+    ratios[forb] = 100*forb_count/(double(width)*double(width));
+    ratios[grass] = 100*grass_count/(double(width)*double(width));
+  
+    cout<<"Empty: "<<ratios[empty]<<endl;
+    cout<<"Para: "<<ratios[parasite]<<endl;
+    cout<<"Forb: "<<ratios[forb]<<endl;
+    cout<<"Grass: "<<ratios[grass]<<endl<<endl;
+    
+
+    
+}
+
+
+
 //===================================Self explanatory==========================================
 
 
@@ -223,4 +286,5 @@ void Lattice::printLattice()
         }
         cout<<endl;
     }
+    cout<<endl<<endl;
 }

@@ -18,12 +18,13 @@ using namespace std;
 class Lattice
 {
 public:
-    Lattice(int setWidth, double prob[4], double setBirthRate[4], double setDeathRate, int setSeedRadius, double setDeathrate, int radius, double dt, double setToxinStrength, int setYearLength);
+    Lattice(int setWidth, double prob[4], double setBirthRate[4], double setDeathRate, int setSeedRadius, int radius, double dt, double setToxinStrength, int setYearLength);
     void advanceYear();
     void endOfYear();
     void advanceTimeStep();
     double getDeathRate(int i, int j);
     void checkEvent(int i, int j);
+    void population();
     void printLattice();
     mt19937 matrix_rand;
     std::uniform_real_distribution<double> unif;
@@ -32,7 +33,7 @@ public:
     mt19937 run_rand;
     std::uniform_int_distribution<int> unifRun;
     mt19937 loc_rand;
-    std::uniform_int_distribution<int> unifLoc;
+    std::uniform_int_distribution<int> unifLoc;//TODO:clean up random number generators
     
     
 private:

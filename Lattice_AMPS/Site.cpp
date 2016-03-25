@@ -27,6 +27,13 @@ Site::Site()
 
 //======Calculate death rate based on neighbors================================
 
+void Site::setNeighbors()
+{
+    neighbors[0] = left;
+    neighbors[1] = right;
+    neighbors[2] = top;
+    neighbors[3] = bottom;
+}
 double Site::getDeathRate()
 {
     double rate = deathRate;
@@ -36,7 +43,7 @@ double Site::getDeathRate()
         {
             if (neighbors[i]->species==parasite)
             {
-                rate+=1/(toxinStrength);
+                rate+=toxinStrength/4;//TODO: depends on neighborhood definition
             }
         }
     }
@@ -44,18 +51,33 @@ double Site::getDeathRate()
    
 }
 
-//=======How many seeds have been planted here===================================
+//=======How many seeds are generated===================================
 int Site::numSeeds()
 {
-    
+    int n = 0;
     if (species!=empty)
     {
         
         double range = seedRange[1]-seedRange[0];
-        int n = floor(unif(mt_rand)*range+1+seedRange[1]); //TODO: C++ify
+        n = int(floor(unif(mt_rand)*range+1+seedRange[1])); //TODO: C++ify
     }
+    return n;
 }
 
+int Site::numSeedsHere()
+{
+    int n = 0;
+    for(int i = 0; i < 4;i++)
+    {
+        n+=seeds[i];
+    }
+    return n;
+}
+
+bool Site::hasSeeds()
+{
+    return (numSeedsHere()>0);
+}
 
 //=======sprout a species, based on proportion of planted seeds of that type=====
 void Site::sproutSeeds()
@@ -63,19 +85,19 @@ void Site::sproutSeeds()
     std::uniform_real_distribution<double>::param_type newParams(0,1);
     unif.param(newParams);
     double rand = unif(mt_rand);
-    double numseeds = double(numSeeds());
+    double numseedshere = double(numSeedsHere());
     
     if (hasSeeds())
     {
-        if(rand < (double(seeds[0])/numseeds))
+        if(rand < (double(seeds[parasite])/numseedshere))
         {
             species = parasite;
         }
-        else if(rand<(double(seeds[0]+seeds[1])/numseeds))
+        else if(rand<(double(seeds[parasite]+seeds[forb])/numseedshere))
         {
             species = forb;
         }
-        else
+        else if(rand<(double(seeds[parasite]+seeds[forb]+seeds[grass])/numseedshere))
         {
             species = grass;
         }

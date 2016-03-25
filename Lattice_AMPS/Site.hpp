@@ -20,22 +20,24 @@ class Site
 {
 public:
     Site();
+    int numSeedsHere();
     int numSeeds();
-    bool hasSeeds(){return numSeeds()>0;}
+    bool hasSeeds();
     int species;
-    int seeds[4];
-    int seedRange[2] = [2,4];
+    int seeds[4] = {0,0,0,0};
+    int seedRange[2] = {2,4};
     
     Site* left;
     Site* right;
     Site* top;
     Site* bottom;
-    Site* neighbors[4] = {left,right,top,bottom};
+    Site* neighbors[4];
     
     void die(){species=0;}
     double getDeathRate();
     void sproutSeeds();
     void plant(int s);
+    void setNeighbors();
     double deathRate;
     double toxinStrength;
     mt19937 mt_rand;
