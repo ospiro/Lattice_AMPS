@@ -14,7 +14,7 @@ int main()
     double toxinStrength = 4;
     double startingProb[4] = {0.25,0.25,0.25,0.25};
     int setYearLength = 4;
-    double setdt = 0.01
+    double setdt = 0.01;
     //double deathRate = 1;
     Lattice myLattice(100,startingProb,birthRate,seedRadius, setdt, toxinStrength, setYearLength );
     for(int i = 0;i<10;i++)
