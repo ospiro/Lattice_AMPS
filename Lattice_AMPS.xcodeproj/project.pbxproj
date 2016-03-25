@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A74A819C1C66F9D9000C12BD /* latticemain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A74A819B1C66F9D9000C12BD /* latticemain.cpp */; };
+		A74A819C1C66F9D9000C12BD /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A74A819B1C66F9D9000C12BD /* main.cpp */; };
+		A7D829671C987BAF00DA4885 /* Site.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7D829651C987BAF00DA4885 /* Site.cpp */; };
+		A7D8296A1C987BFC00DA4885 /* Lattice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A7D829681C987BFC00DA4885 /* Lattice.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +26,11 @@
 
 /* Begin PBXFileReference section */
 		A74A81981C66F9D9000C12BD /* Lattice_AMPS */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Lattice_AMPS; sourceTree = BUILT_PRODUCTS_DIR; };
-		A74A819B1C66F9D9000C12BD /* latticemain.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = latticemain.cpp; sourceTree = "<group>"; };
+		A74A819B1C66F9D9000C12BD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		A7D829651C987BAF00DA4885 /* Site.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Site.cpp; sourceTree = "<group>"; };
+		A7D829661C987BAF00DA4885 /* Site.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Site.hpp; sourceTree = "<group>"; };
+		A7D829681C987BFC00DA4885 /* Lattice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lattice.cpp; sourceTree = "<group>"; };
+		A7D829691C987BFC00DA4885 /* Lattice.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Lattice.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +63,11 @@
 		A74A819A1C66F9D9000C12BD /* Lattice_AMPS */ = {
 			isa = PBXGroup;
 			children = (
-				A74A819B1C66F9D9000C12BD /* latticemain.cpp */,
+				A74A819B1C66F9D9000C12BD /* main.cpp */,
+				A7D829651C987BAF00DA4885 /* Site.cpp */,
+				A7D829661C987BAF00DA4885 /* Site.hpp */,
+				A7D829681C987BFC00DA4885 /* Lattice.cpp */,
+				A7D829691C987BFC00DA4885 /* Lattice.hpp */,
 			);
 			path = Lattice_AMPS;
 			sourceTree = "<group>";
@@ -118,7 +128,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A74A819C1C66F9D9000C12BD /* latticemain.cpp in Sources */,
+				A7D8296A1C987BFC00DA4885 /* Lattice.cpp in Sources */,
+				A74A819C1C66F9D9000C12BD /* main.cpp in Sources */,
+				A7D829671C987BAF00DA4885 /* Site.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,7 +219,8 @@
 		A74A81A01C66F9D9000C12BD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_OPTIMIZATION_LEVEL = 3;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -216,6 +229,7 @@
 		A74A81A11C66F9D9000C12BD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
