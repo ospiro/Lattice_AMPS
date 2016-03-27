@@ -380,7 +380,7 @@ void Lattice::advanceTimeStep()
         int j = unif(event_rand);
         checkEvent(i,j);
     }
-    printLattice();
+//    printLattice();
 }
 
 //==============move time forward one year, WINTER============================================
@@ -481,7 +481,7 @@ void Lattice::printLattice()
                             }
                             else if(lat[width*i+j].isDeveloped())
                             {
-                                cout<< BOLDCYAN << "o " <<RESET; //TODO: choose diff color after testing addDev
+                                cout<< BLACK << "o " <<RESET; //TODO: choose diff color after testing addDev
                             }
 //                            else
 //                            {
