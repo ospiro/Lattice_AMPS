@@ -22,10 +22,12 @@ public:
     void advanceYear();
     void endOfYear();
     void advanceTimeStep();
+    void addDevelopment(double amountDevelopment);
     double getDeathRate(int i, int j);
     void checkEvent(int i, int j);
-    void population();
+    double* population();
     void printLattice();
+    bool checkExtinction();
     mt19937 matrix_rand;
     std::uniform_real_distribution<double> unif;
     mt19937 event_rand;
@@ -34,10 +36,10 @@ public:
     std::uniform_int_distribution<int> unifRun;
     mt19937 loc_rand;
     std::uniform_int_distribution<int> unifLoc;//TODO:clean up random number generators
+    std::vector<Site> lat; //move back to private after testing
     
     
 private:
-    std::vector<Site> lat;
     int width;
     int numSpecies;
     int birthRate[4];

@@ -23,6 +23,8 @@ public:
     int numSeedsHere();
     int numSeeds();
     bool hasSeeds();
+    bool isDeveloped();
+    void develop();
     int species;
     int seeds[4] = {0,0,0,0};
     int seedRange[2] = {2,4};
@@ -42,11 +44,6 @@ public:
     double toxinStrength;
     mt19937 mt_rand;
     std::uniform_real_distribution<double> unif;
-    
-      
 };
-
-
-
 
 #endif /* Site_hpp */

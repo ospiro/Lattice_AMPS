@@ -21,21 +21,27 @@ int main()
     double setDeathRate = 1;
     
     int seedRadius = 10;
-    double toxinStrength = 1;
+    double toxinStrength = 4;
     int setYearLength = 4;
     
     double setdt = 0.01;
     
     
-    Lattice myLattice(100,startingProb,birthRate,seedRadius, setDeathRate, setdt, toxinStrength, setYearLength );
-    for(int i = 0;i<10;i++)
+    Lattice myLattice(50,startingProb,birthRate,seedRadius, setDeathRate, setdt, toxinStrength, setYearLength );
+//    for(int i = 0;i<10;i++)
+//    {
+//    myLattice.advanceYear();
+//    }
+    for(int i = 0;i< 50*50;i++)
     {
-    myLattice.advanceYear();
+        myLattice.lat[i].die();
     }
+    myLattice.printLattice();
+    cout<<endl<<endl;
+    myLattice.addDevelopment(20);
+    myLattice.printLattice();
     
     
     
-
-  
-
+    
 }

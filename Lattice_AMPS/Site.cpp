@@ -25,8 +25,6 @@ Site::Site()
     mt_rand.seed(static_cast<unsigned int>(time(NULL)));
 }
 
-//======Calculate death rate based on neighbors================================
-
 void Site::setNeighbors()
 {
     neighbors[0] = left;
@@ -34,6 +32,10 @@ void Site::setNeighbors()
     neighbors[2] = top;
     neighbors[3] = bottom;
 }
+
+//======Calculate death rate based on neighbors================================
+
+
 double Site::getDeathRate()
 {
     double rate = deathRate;
@@ -55,7 +57,7 @@ double Site::getDeathRate()
 int Site::numSeeds()
 {
     int n = 0;
-    if (species!=empty)
+    if (species!=empty && isDeveloped()==false)
     {
         
         double range = seedRange[1]-seedRange[0];
@@ -63,7 +65,7 @@ int Site::numSeeds()
     }
     return n;
 }
-
+//==========How many seeds have been planted here========================================
 int Site::numSeedsHere()
 {
     int n = 0;
@@ -73,11 +75,25 @@ int Site::numSeedsHere()
     }
     return n;
 }
-
+//======Whether there have been seeds planted here at all========================================
 bool Site::hasSeeds()
 {
     return (numSeedsHere()>0);
 }
+//========develop a site==========================================================
+void Site::develop()
+{
+    species=4;
+}
+
+
+
+//=================check whether is a developed site========================================
+bool Site::isDeveloped()
+{
+    return (species==4);
+}
+
 
 //=======sprout a species, based on proportion of planted seeds of that type=====
 void Site::sproutSeeds()
