@@ -18,7 +18,7 @@ using namespace std;
 class Lattice
 {
 public:
-    Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSeedRadius, double setDeathRate, double dt, double setToxinStrength, int setYearLength);
+    Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSeedRadius, double setDeathRate, double dt, double setToxinStrength, int setYearLength, double setAmountDevelopment);
     void advanceYear();
     void endOfYear();
     void advanceTimeStep();
@@ -47,6 +47,7 @@ private:
     double seedRadius;
     double dt;
     int yearLength;
+    double amountDevelopment;
 
 };
 #endif /* Lattice_hpp */

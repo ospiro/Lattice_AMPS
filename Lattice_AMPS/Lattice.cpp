@@ -43,7 +43,7 @@ int mod(int x, int m) { //got from http://stackoverflow.com/questions/1082917/mo
     return (x%m + m)%m;
 }
 
-Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSeedRadius, double setDeathRate, double dt, double setToxinStrength, int setYearLength)
+Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSeedRadius, double setDeathRate, double dt, double setToxinStrength, int setYearLength, double setAmountDevelopment)
 {
 //===============================Set base properties==============================================
     
@@ -58,6 +58,7 @@ Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSe
     std::copy(setBirthRate,setBirthRate+4,birthRate);
     seedRadius = setSeedRadius;
     yearLength = setYearLength;
+    amountDevelopment = setAmountDevelopment;
     
     //seed the generators and set bounds for the uniform distributions
     matrix_rand.seed(static_cast<unsigned int>(time(NULL)));
@@ -148,7 +149,10 @@ Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSe
             
         }
     }
-//TODO: add development fcn
+if (amountDevelopment > 0)
+{
+    addDevelopment(amountDevelopment);
+}
 //FIXME: add 4 Handing
     
 
