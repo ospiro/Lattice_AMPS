@@ -295,22 +295,25 @@ void Lattice::addDevelopment(double amountDevelopment)
 
 void Lattice::checkEvent(int i, int j) //TODO: make this and getDeathRate take Site params instead of coordinates
 {
-    double trueDeathRate;
-    if ((lat[width*i+j].species != empty) && (lat[width*i+j].isDeveloped()==false))
+    if(lat[width*i+j].isDeveloped()==false)
     {
-        trueDeathRate = lat[width*i+j].getDeathRate();
-    }
+        double trueDeathRate;
+        if ((lat[width*i+j].species != empty))
+        {
+            trueDeathRate = lat[width*i+j].getDeathRate();
+        }
     
     
-    double rand = unifEvent(event_rand);
-    int rand2 = unifRun(run_rand);
-    if(rand<trueDeathRate*dt)
-    {
-        lat[width*i+j].die();//TODO: assign this element to a variable, then use variable in rest of function.( assign to pointer?)
-    }
-    else if ((lat[width*i+j].neighbors[rand2]->species==empty) && rand<(trueDeathRate+birthRate[lat[width*i+j].species])*dt) //TODO: convoluted, fix using the above assignment
-    {
-        lat[width*i+j].neighbors[rand2]->species=lat[width*i+j].species;
+        double rand = unifEvent(event_rand);
+        int rand2 = unifRun(run_rand);
+        if(rand<trueDeathRate*dt)
+        {
+            lat[width*i+j].die();//TODO: assign this element to a variable, then use variable in rest of function.( assign to pointer?)
+        }
+        else if ((lat[width*i+j].neighbors[rand2]->species==empty) && rand<(trueDeathRate+birthRate[lat[width*i+j].species])*dt) //TODO: convoluted, fix using the above assignment
+        {
+            lat[width*i+j].neighbors[rand2]->species=lat[width*i+j].species;
+        }
     }
 }
 
@@ -331,6 +334,8 @@ void Lattice::endOfYear()
     {
         for(int j = 0;j<width;j++)
         {
+            if(lat[width*i+j].isDeveloped()==false)
+            {
         double thetarand = unif(event_rand);
         double theta = thetarand*2*3.14159;
             
@@ -345,7 +350,7 @@ void Lattice::endOfYear()
             
             
             lat[width*targI+targJ].plant(lat[width*i+j].species);
-            
+            }
         }
     
     }
@@ -375,6 +380,7 @@ void Lattice::advanceTimeStep()
         int j = unif(event_rand);
         checkEvent(i,j);
     }
+    printLattice();
 }
 
 //==============move time forward one year, WINTER============================================
@@ -475,12 +481,12 @@ void Lattice::printLattice()
                             }
                             else if(lat[width*i+j].isDeveloped())
                             {
-                                cout<< RED << "o " <<RESET; //TODO: choose diff color after testing addDev
+                                cout<< BOLDCYAN << "o " <<RESET; //TODO: choose diff color after testing addDev
                             }
-                            else
-                            {
-                                cout<<"o ";
-                            }
+//                            else
+//                            {
+//                                cout<<"o ";
+//                            }
                         }
                         cout<<endl;;
                     }

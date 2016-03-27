@@ -28,19 +28,22 @@ int main()
     
     
     Lattice myLattice(50,startingProb,birthRate,seedRadius, setDeathRate, setdt, toxinStrength, setYearLength );
-//    for(int i = 0;i<10;i++)
-//    {
-//    myLattice.advanceYear();
-//    }
-    for(int i = 0;i< 50*50;i++)
-    {
-        myLattice.lat[i].die();
-    }
-    myLattice.printLattice();
-    cout<<endl<<endl;
     myLattice.addDevelopment(20);
     myLattice.printLattice();
-    
+    for(int i = 0;i<10;i++)
+    {
+    myLattice.advanceYear();
+    myLattice.printLattice();
+    }
+//    for(int i = 0;i< 50*50;i++)
+//    {
+//        myLattice.lat[i].die();
+//    }
+//    myLattice.printLattice();
+//    cout<<endl<<endl;
+//    myLattice.addDevelopment(2000);
+//    myLattice.printLattice();
+//    
     
     
     
