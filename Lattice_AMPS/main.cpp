@@ -32,12 +32,17 @@ int main(int argc, char** argv)
     
     double setdt = 0.01;
     
-    
+    if( amountDevelopment >= 0.8*width*width)
+    {
+        cout<<"amountDevelopment too high, process terminated."<<endl;
+        exit(1);
+    }
     
     Lattice myLattice(width,startingProb,birthRate,seedRadius, setDeathRate, setdt, toxinStrength, setYearLength, amountDevelopment);
     int yearOfDeath = 0;
-    for( int i = 0; i< numYearsRun;i++)
+    for( int i = 1; i <= numYearsRun;i++)
     {
+        myLattice.printCSVLattice();
         myLattice.advanceYear();
         if (myLattice.checkExtinction()==true)
         {

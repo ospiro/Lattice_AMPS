@@ -28,6 +28,7 @@ public:
     double* population();
     void printLattice();
     bool checkExtinction();
+    void printCSVLattice();
     mt19937 matrix_rand;
     std::uniform_real_distribution<double> unif;
     mt19937 event_rand;

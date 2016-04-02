@@ -10,6 +10,7 @@
 #include "Lattice.hpp"
 #include <iostream>
 #include <cmath>
+#include <fstream>
 
 #define empty 0
 #define parasite 1
@@ -254,7 +255,7 @@ void Lattice::addDevelopment(double amountDevelopment)
             int curI = Nodes[whichNode][1];
             
             // Then do a random walk from that node until we reach an undeveloped square:
-            while(curI>0 && curJ >0 && curI <= width-1 && curJ <= width-1 && lat[width*curI+curJ].isDeveloped())
+            while(lat[width*curI+curJ].isDeveloped())
                 {
                     int s = unif(event_rand)*4 + 1;
                     curJ = mod(curJ+stepJ[s],width); //TODO: ask mark if mod is correct in matlab code
@@ -508,4 +509,45 @@ void Lattice::printLattice()
 //        cout<<endl;
 //    }
 //    cout<<endl<<endl;
+}
+
+void Lattice::printCSVLattice()
+{
+    ofstream CSVMatrices; //uncomment this and the next three lines to get record.csv
+    CSVMatrices.open("CSVMatrices.csv", std::ios_base::app);
+    for(int i =0;i<width;i++)
+    {
+        for(int j=0;j<width;j++)
+        {
+            if(lat[width*i+j].species==empty)
+            {
+                CSVMatrices<<lat[width*i+j].species<<",";
+            }
+            else if(lat[width*i+j].species==parasite)
+            {
+                CSVMatrices<< lat[width*i+j].species<<",";
+            }
+            else if(lat[width*i+j].species==forb)
+            {
+                CSVMatrices<< lat[width*i+j].species<<",";
+            }
+            else if(lat[width*i+j].species==grass)
+            {
+                CSVMatrices<< lat[width*i+j].species<<",";
+            }
+            else if(lat[width*i+j].isDeveloped())
+            {
+                CSVMatrices<< lat[width*i+j].species<<","; //TODO: choose diff color after testing addDev
+            }
+            //                            else
+            //                            {
+            //                                cout<<"o ";
+            //                            }
+        }
+        CSVMatrices<<endl;;
+    }
+    CSVMatrices<<endl<<endl<<endl;
+    CSVMatrices.close();
+    
+    
 }
