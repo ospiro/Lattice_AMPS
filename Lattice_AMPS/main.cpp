@@ -42,7 +42,6 @@ int main(int argc, char** argv)
     int yearOfDeath = 0;
     for( int i = 1; i <= numYearsRun;i++)
     {
-        myLattice.printCSVLattice();
         myLattice.advanceYear();
         if (myLattice.checkExtinction()==true)
         {
