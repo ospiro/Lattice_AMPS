@@ -21,7 +21,7 @@ class Site
 public:
     Site();
     int numSeedsHere();
-    int numSeeds();
+    int numSeeds(mt19937 mt_rand);
     bool hasSeeds();
     bool isDeveloped();
     void develop();
@@ -37,12 +37,12 @@ public:
     
     void die(){species=0;}
     double getDeathRate();
-    void sproutSeeds();
+    void sproutSeeds(mt19937 mt_rand);
     void plant(int s);
     void setNeighbors();
     double deathRate;
     double toxinStrength;
-    mt19937 mt_rand;
+//    mt19937 mt_rand;
     std::uniform_real_distribution<double> unif;
 };
 

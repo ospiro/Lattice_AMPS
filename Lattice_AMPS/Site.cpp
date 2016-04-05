@@ -22,7 +22,7 @@ Site::Site()
     species = 0;
     deathRate = 1;
     toxinStrength = 4; //TODO: initialize toxinstrength in L constructor
-    mt_rand.seed(static_cast<unsigned int>(time(NULL)));
+   // mt_rand.seed(static_cast<unsigned int>(time(NULL)));
 }
 
 void Site::setNeighbors()
@@ -54,7 +54,7 @@ double Site::getDeathRate()
 }
 
 //=======How many seeds are generated===================================
-int Site::numSeeds()
+int Site::numSeeds(mt19937 mt_rand)
 {
     int n = 0;
     if (species!=empty && isDeveloped()==false)
@@ -96,7 +96,7 @@ bool Site::isDeveloped()
 
 
 //=======sprout a species, based on proportion of planted seeds of that type=====
-void Site::sproutSeeds()
+void Site::sproutSeeds(mt19937 mt_rand)
 {
     std::uniform_real_distribution<double>::param_type newParams(0,1);
     unif.param(newParams);

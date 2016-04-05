@@ -341,20 +341,23 @@ void Lattice::endOfYear()
         {
             if(lat[width*i+j].isDeveloped()==false)
             {
-        double thetarand = unif(event_rand);
-        double theta = thetarand*2*3.14159;
+                for(int k = 0; k <= lat[width*i+j].numSeeds(event_rand);k++)
+                {
+                double thetarand = unif(event_rand);
+                double theta = thetarand*2*3.14159;
             
-        double distancerand = unif(event_rand);
-        double distance = floor(distancerand); //TODO: ask: is the +1 so that radius==0 corresp to running?
+                double distancerand = unif(event_rand);
+                double distance = floor(distancerand); //TODO: ask: is the +1 so that radius==0 corresp to running?
             
-        int targJ = mod(int(round(double(i)+distance*cos(theta))),width); //TODO: check behavior, possible problem area
-        int targI = mod(int(round(double(j)+distance*sin(theta))),width);
-        //TODO: ask why conditions for targI==0 were here in matlab code.
+                int targJ = mod(int(round(double(i)+distance*cos(theta))),width); //TODO: check behavior, possible problem area
+                int targI = mod(int(round(double(j)+distance*sin(theta))),width);
+                
             
-        //targI,targJ designate target site for seed dispersal, now we add seeds.
+                //targI,targJ designate target site for seed dispersal, now we add seeds.
             
             
-            lat[width*targI+targJ].plant(lat[width*i+j].species);
+                lat[width*targI+targJ].plant(lat[width*i+j].species);
+                }
             }
         }
     
@@ -367,7 +370,7 @@ void Lattice::endOfYear()
         if(lat[k].isDeveloped()==false)
         {
             lat[k].die(); //TODO: ask if necessary ...//kill all plants
-            lat[k].sproutSeeds();
+            lat[k].sproutSeeds(event_rand);
         }
     }
 }
