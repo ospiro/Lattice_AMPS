@@ -341,7 +341,7 @@ void Lattice::endOfYear()
         {
             if(lat[width*i+j].isDeveloped()==false)
             {
-                for(int k = 0; k <= lat[width*i+j].numSeeds(event_rand);k++)
+                for(int k = 1; k <= lat[width*i+j].numSeeds(event_rand);k++)
                 {
                 double thetarand = unif(event_rand);
                 double theta = thetarand*2*3.14159;
