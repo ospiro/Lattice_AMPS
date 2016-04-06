@@ -62,9 +62,7 @@ Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSe
     amountDevelopment = setAmountDevelopment;
     
     //seed the generators and set bounds for the uniform distributions
-    matrix_rand.seed(static_cast<unsigned int>(time(NULL)));
     event_rand.seed(static_cast<unsigned int>(time(NULL)));
-    loc_rand.seed(static_cast<unsigned int>(time(NULL)));
     std::uniform_real_distribution<double>::param_type newParams(0, 1);
     unif.param(newParams);
     unifEvent.param(newParams);
@@ -81,7 +79,7 @@ Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSe
     std::vector<double> randmatrix;
     for(int i = 0; i < width*width; i++)
     {
-        randmatrix.push_back(unif(matrix_rand)); //TODO: use randmatrix.reserve
+        randmatrix.push_back(unif(event_rand)); //TODO: use randmatrix.reserve
     }
     
     //initializing sites
@@ -310,7 +308,7 @@ void Lattice::checkEvent(int i, int j) //TODO: make this and getDeathRate take S
     
     
         double rand = unifEvent(event_rand);
-        int rand2 = unifRun(run_rand);
+        int rand2 = unifRun(event_rand);
         if(rand<trueDeathRate*dt)
         {
             lat[width*i+j].die();//TODO: assign this element to a variable, then use variable in rest of function.( assign to pointer?)
@@ -370,7 +368,7 @@ void Lattice::endOfYear()
         if(lat[k].isDeveloped()==false)
         {
             lat[k].die(); //TODO: ask if necessary ...//kill all plants
-            lat[k].sproutSeeds(event_rand);
+            lat[k].sproutSeeds(event_rand); //need to pass rng to this fcn
         }
     }
 }

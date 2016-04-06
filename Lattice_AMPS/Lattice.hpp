@@ -29,13 +29,10 @@ public:
     void printLattice();
     bool checkExtinction();
     void printCSVLattice();
-    mt19937 matrix_rand;
     std::uniform_real_distribution<double> unif;
     mt19937 event_rand;
     std::uniform_real_distribution<double> unifEvent;
-    mt19937 run_rand;
     std::uniform_int_distribution<int> unifRun;
-    mt19937 loc_rand;
     std::uniform_int_distribution<int> unifLoc;//TODO:clean up random number generators
     std::vector<Site> lat; //move back to private after testing
     
