@@ -32,16 +32,19 @@ int main(int argc, char** argv)
     
     double setdt = 0.01;
     
+    int devType = atoi(argv[6]);
+    
     if( amountDevelopment >= 0.8*width*width)
     {
         cout<<"amountDevelopment too high, process terminated."<<endl;
         exit(1);
     }
     
-    Lattice myLattice(width,startingProb,birthRate,seedRadius, setDeathRate, setdt, toxinStrength, setYearLength, amountDevelopment);
+    Lattice myLattice(width,startingProb,birthRate,seedRadius, setDeathRate, setdt, toxinStrength, setYearLength, amountDevelopment, devType);
     int yearOfDeath = 0;
     for( int i = 1; i <= numYearsRun;i++)
     {
+        myLattice.printLattice(); //comment out this line and uncomment lines 55-58 (inclusive) to return to normal tracking behavior
         myLattice.advanceYear();
         if (myLattice.checkExtinction()==true)
         {
@@ -49,10 +52,10 @@ int main(int argc, char** argv)
             break;
         }
     }
-    ofstream record; //uncomment this and the next three lines to get record.csv
-    record.open("record.csv", std::ios_base::app);
-    record<<width<<","<<seedRadius<<","<<toxinStrength<<","<<amountDevelopment<<","<<yearOfDeath<<endl;
-    record.close();
+//    ofstream record; //uncomment this and the next three lines to get record.csv
+//    record.open("record.csv", std::ios_base::app);
+//    record<<width<<","<<seedRadius<<","<<toxinStrength<<","<<amountDevelopment<<","<<yearOfDeath<<endl;
+//    record.close();
     
     
 }

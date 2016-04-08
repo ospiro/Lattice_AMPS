@@ -18,7 +18,7 @@ using namespace std;
 class Lattice
 {
 public:
-    Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSeedRadius, double setDeathRate, double dt, double setToxinStrength, int setYearLength, double setAmountDevelopment);
+    Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSeedRadius, double setDeathRate, double dt, double setToxinStrength, int setYearLength, double setAmountDevelopment, int devType);
     void advanceYear();
     void endOfYear();
     void advanceTimeStep();
@@ -29,6 +29,7 @@ public:
     void printLattice();
     bool checkExtinction();
     void printCSVLattice();
+    int devType;
     std::uniform_real_distribution<double> unif;
     mt19937 event_rand;
     std::uniform_real_distribution<double> unifEvent;

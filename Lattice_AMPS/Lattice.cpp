@@ -44,10 +44,10 @@ int mod(int x, int m) { //got from http://stackoverflow.com/questions/1082917/mo
     return (x%m + m)%m;
 }
 
-Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSeedRadius, double setDeathRate, double dt, double setToxinStrength, int setYearLength, double setAmountDevelopment)
+Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSeedRadius, double setDeathRate, double dt, double setToxinStrength, int setYearLength, double setAmountDevelopment, int devType)
 {
 //===============================Set base properties==============================================
-    
+    this->devType = devType;
     width = setWidth;
     lat.resize(width*width); //technically one dimensional
     for(int i = 0;i<width*width;i++)
@@ -169,6 +169,24 @@ void Lattice::addDevelopment(double amountDevelopment)
     int q = int ( floor(unif(event_rand)*3 + 1) + floor(unif(event_rand)*3 + 1) );
     int numNodes = round(unif(event_rand)*q);
     int numLines = q - numNodes;
+     //TODO: add six argument: decType, o==> all nodes 1===> all lines
+    switch (devType){
+            
+        case 0:
+            break;
+        case 1:
+            numNodes = 0;
+            numLines = q;
+            break;
+        case 2:
+            numNodes = q;
+            numLines = 0;
+            break;
+    }
+    
+    
+   
+    
     
     /*  nodesProportion is the percentage of development that will
      bud off of nodes vs. off of lines.  For now, we simply make
