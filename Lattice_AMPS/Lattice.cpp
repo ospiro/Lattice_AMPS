@@ -152,7 +152,6 @@ if (amountDevelopment > 0)
 {
     addDevelopment(amountDevelopment);
 }
-//FIXME: add 4 Handing
     
 
 }
@@ -505,34 +504,17 @@ void Lattice::printLattice()
                             }
                             else if(lat[width*i+j].isDeveloped())
                             {
-                                cout<< BLACK << "o " <<RESET; //TODO: choose diff color after testing addDev
+                                cout<< BLACK << "o " <<RESET; 
                             }
-//                            else
-//                            {
-//                                cout<<"o ";
-//                            }
                         }
                         cout<<endl;;
                     }
                     cout<<endl<<endl<<endl;
-    
-    
-    
-    
-//    for (int i = 0 ; i<width; i++)
-//    {
-//        for (int j = 0 ; j<width ; j++)
-//        {
-//            cout<<lat[width*i+j].species;
-//        }
-//        cout<<endl;
-//    }
-//    cout<<endl<<endl;
 }
 
 void Lattice::printCSVLattice()
 {
-    ofstream CSVMatrices; //uncomment this and the next three lines to get record.csv
+    ofstream CSVMatrices;
     CSVMatrices.open("CSVMatrices.csv", std::ios_base::app);
     for(int i =0;i<width;i++)
     {
@@ -556,12 +538,8 @@ void Lattice::printCSVLattice()
             }
             else if(lat[width*i+j].isDeveloped())
             {
-                CSVMatrices<< lat[width*i+j].species<<","; //TODO: choose diff color after testing addDev
+                CSVMatrices<< lat[width*i+j].species<<",";
             }
-            //                            else
-            //                            {
-            //                                cout<<"o ";
-            //                            }
         }
         CSVMatrices<<endl;;
     }
