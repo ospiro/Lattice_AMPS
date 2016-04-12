@@ -27,7 +27,7 @@ public:
     void develop();
     int species;
     int seeds[4] = {0,0,0,0};
-    int seedRange[2] = {2,4};
+    int seedRange[2];
     
     Site* left;
     Site* right;

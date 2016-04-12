@@ -61,7 +61,7 @@ int Site::numSeeds(mt19937 mt_rand)
     {
         
         double range = seedRange[1]-seedRange[0];
-        n = int(floor(unif(mt_rand)*range+1+seedRange[1])); //TODO: C++ify
+        n = int(floor(unif(mt_rand)*range+1+seedRange[0])); //TODO: C++ify
     }
     return n;
 }

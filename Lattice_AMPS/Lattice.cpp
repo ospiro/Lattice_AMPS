@@ -44,7 +44,7 @@ int mod(int x, int m) { //got from http://stackoverflow.com/questions/1082917/mo
     return (x%m + m)%m;
 }
 
-Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSeedRadius, double setDeathRate, double dt, double setToxinStrength, int setYearLength, double setAmountDevelopment, int devType)
+Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSeedRadius, double setDeathRate, double dt, double setToxinStrength, int setYearLength, double setAmountDevelopment, int devType, int numberofseeds)
 {
 //===============================Set base properties==============================================
     this->devType = devType;
@@ -54,7 +54,10 @@ Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSe
     {
         lat[i].toxinStrength = setToxinStrength;
         lat[i].deathRate = setDeathRate;
+        lat[i].seedRange[0] = 0;
+        lat[i].seedRange[1] = numberofseeds;
     }
+    
     
     std::copy(setBirthRate,setBirthRate+4,birthRate);
     seedRadius = setSeedRadius;
