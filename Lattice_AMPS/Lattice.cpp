@@ -359,7 +359,7 @@ void Lattice::endOfYear()
         {
             if(lat[width*i+j].isDeveloped()==false)
             {
-                for(int k = 1; k <= lat[width*i+j].numSeeds(event_rand);k++)
+                for(int k = 1; k <= lat[width*i+j].numSeeds(&event_rand);k++)
                 {
                 double thetarand = unif(event_rand);
                 double theta = thetarand*2*3.14159;
@@ -388,7 +388,7 @@ void Lattice::endOfYear()
         if(lat[k].isDeveloped()==false)
         {
             lat[k].die(); //TODO: ask if necessary ...//kill all plants
-            lat[k].sproutSeeds(event_rand); //need to pass rng to this fcn
+            lat[k].sproutSeeds(&event_rand); //need to pass rng to this fcn
         }
     }
 }

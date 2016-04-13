@@ -2,6 +2,7 @@
 #include "Site.hpp"
 #include <iostream>
 #include <fstream>
+#include <random>
 #define empty 0
 #define parasite 1
 #define forb 2
@@ -12,6 +13,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+    
     int width  = atoi(argv[1]); // first arg
     
     double startingProb[4] = {0.25,0.25,0.25,0.25};
@@ -44,14 +46,11 @@ int main(int argc, char** argv)
     
     Lattice myLattice(width,startingProb,birthRate,seedRadius, setDeathRate, setdt, toxinStrength, setYearLength, amountDevelopment, devType,numberofseeds);
 
-    
-    
-    
-    
+
     int yearOfDeath = 0;
     for( int i = 1; i <= numYearsRun;i++)
     {
-//        myLattice.printLattice(); //comment out this line and uncomment lines 55-58 (inclusive) to return to normal tracking behavior
+        myLattice.printLattice(); //comment out this line and uncomment lines 55-58 (inclusive) to return to normal tracking behavior
         myLattice.advanceYear();
         if (myLattice.checkExtinction()==true)
         {
@@ -59,10 +58,10 @@ int main(int argc, char** argv)
             break;
         }
     }
-    ofstream record; //uncomment this and the next three lines to get record.csv
-    record.open("record.csv", std::ios_base::app);
-    record<<width<<","<<seedRadius<<","<<toxinStrength<<","<<amountDevelopment<<","<<numberofseeds<<","<<yearOfDeath<<endl;
-    record.close();
-    
+//    ofstream record; //uncomment this and the next three lines to get record.csv
+//    record.open("record.csv", std::ios_base::app);
+//    record<<width<<","<<seedRadius<<","<<toxinStrength<<","<<amountDevelopment<<","<<numberofseeds<<","<<yearOfDeath<<endl;
+//    record.close();
+//    
     
 }
