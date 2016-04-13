@@ -56,12 +56,11 @@ double Site::getDeathRate()
 //=======How many seeds are generated===================================
 int Site::numSeeds(mt19937 mt_rand)
 {
+    std::uniform_int_distribution<int> rangegen(0,seedRange[1]);
     int n = 0;
     if (species!=empty && isDeveloped()==false)
     {
-        
-        double range = seedRange[1]-seedRange[0];
-        n = int(floor(unif(mt_rand)*range+1+seedRange[0])); //TODO: C++ify
+        n = rangegen(mt_rand);
     }
     return n;
 }
