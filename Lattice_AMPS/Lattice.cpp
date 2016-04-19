@@ -11,6 +11,7 @@
 #include <iostream>
 #include <cmath>
 #include <fstream>
+#include <sys/types.h>
 
 #define empty 0
 #define parasite 1
@@ -65,7 +66,7 @@ Lattice::Lattice(int setWidth, double prob[4], double setBirthRate[4], int setSe
     amountDevelopment = setAmountDevelopment;
     
     //seed the generators and set bounds for the uniform distributions
-    event_rand.seed(static_cast<unsigned int>(time(NULL)));
+    event_rand.seed(static_cast<unsigned int>(getpid()*time(NULL)));
     std::uniform_real_distribution<double>::param_type newParams(0, 1);
     unif.param(newParams);
     unifEvent.param(newParams);
@@ -365,7 +366,7 @@ void Lattice::endOfYear()
                 double theta = thetarand*2*3.14159;
             
                 double distancerand = unif(event_rand);
-                double distance = floor(distancerand); //TODO: ask: is the +1 so that radius==0 corresp to running?
+                double distance = floor(distancerand);
             
                 int targJ = mod(int(round(double(i)+distance*cos(theta))),width); //TODO: check behavior, possible problem area
                 int targI = mod(int(round(double(j)+distance*sin(theta))),width);
